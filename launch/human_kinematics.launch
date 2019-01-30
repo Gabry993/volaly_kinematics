@@ -1,0 +1,30 @@
+<launch>
+  <arg name="publish_rate" default="50" />
+  <arg name="imu_joint_states_topic" default="/mwear1/joint_states"/>
+
+  <group ns="human">
+    <!-- Clean previously loaded model -->
+    <rosparam command="delete" param="robot_description"/>
+    <param name="robot_description" textfile="$(find volaly_kinematics)/urdf/human_kinematics.urdf" />
+
+    <node name="joint_state_publisher" pkg="joint_state_publisher" type="joint_state_publisher" required="true" output="screen">
+      <param name="use_gui" value="false"/>
+      <param name="rate" value="50"/>
+      <rosparam param="source_list" subst_value="true">[$(arg imu_joint_states_topic)]</rosparam>
+      <rosparam command="load" file="$(find volaly_kinematics)/config/human_kinematics.yaml"/>
+    </node>
+
+    <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher" required="true" output="screen"/>
+
+    <node name="pointing_model" pkg="volaly_kinematics" type="pointing_node.py" required="true" output="screen">
+      <param name="publish_rate" value="$(arg publish_rate)" />
+      <param name="ray_origin_frame" value="eyes"/>
+      <param name="ray_pass_frame" value="finger"/>
+      <param name="human_frame" value="human_footprint"/>
+    </node>
+
+    <!-- <node name="static_robot_tf" pkg="tf" type="static_transform_publisher" required="true" output="screen"
+      args="1.0 1.0 2.6 0.0 0.0 0.0 human_footprint robot_base_link 20"/> -->
+
+  </group>
+</launch>
