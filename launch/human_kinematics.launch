@@ -1,8 +1,20 @@
 <launch>
   <arg name="publish_rate" default="50" />
-  <arg name="imu_joint_states_topic" default="/mwear1/joint_states"/>
+  <arg name="robot_name" default="cf"/>
+  <arg name="bracelet_name" default="mwear"/>
+  <arg name="mwear_address" default="d8:14:50:a0:d4:87"/>
+  <arg name="imu_joint_states_topic" default="$(arg bracelet_name)/joint_states"/>
 
   <group ns="human">
+    <!-- Sensor (MetaWear) -->
+    <node name="mwear" type="metawear_node.py" pkg="metawear_ros" required="true" output="screen">
+      <param name="address" type="string" value="$(arg mwear_address)"/>
+      <param name="mimic_myo_frame" value="false"/>
+      <rosparam param="led_color"><!-- cyan -->
+          {r: 0.0, g: 1.0, b: 1.0, a: 1.0}
+      </rosparam>
+    </node>
+
     <!-- Clean previously loaded model -->
     <rosparam command="delete" param="robot_description"/>
     <param name="robot_description" textfile="$(find volaly_kinematics)/urdf/human_kinematics.urdf" />
@@ -21,10 +33,37 @@
       <param name="ray_origin_frame" value="eyes"/>
       <param name="ray_pass_frame" value="finger"/>
       <param name="human_frame" value="human_footprint"/>
+      <param name="robot_frame" value="$(arg robot_name)/base_link"/>
+
+      <param name="arm_pointer_topic" value="arm_pointer"/>
+      <param name="pointing_ray_topic" value="pointing_ray"/>
+
+      <param name="switch_at_pointer" value="false"/>
+      <param name="pointer_switch_margin" value="0.30"/>
+
+      <!-- Visualization -->
+      <param name="markers_topic" value="markers"/>
+
     </node>
 
-    <!-- <node name="static_robot_tf" pkg="tf" type="static_transform_publisher" required="true" output="screen"
-      args="1.0 1.0 2.6 0.0 0.0 0.0 human_footprint robot_base_link 20"/> -->
+    <node name="wrist_gest" type="meta_gest.py" pkg="volaly_gestures" required="true" output="screen">
+        <param name="publish_rate" value="50.0"/>
+        <param name="cache_time" value="30.0"/>
+        <param name="averaging_time" value="1.3"/>
+        <param name="horizon_time" value="0.0"/>
 
+        <param name="ray_origin_frame" value="shoulder"/>
+        <param name="ray_pass_frame" value="finger"/>
+        <param name="human_frame" value="human_footprint"/>
+
+        <param name="roll_threshold_deg" value="80.0"/>
+
+        <param name="vibration_pattern_topic" value="$(arg bracelet_name)/vibration_pattern"/>
+        <param name="vibration_time" value="0.080"/>
+    </node>
+
+<!--     <node name="static_robot_tf" pkg="tf" type="static_transform_publisher" required="true" output="screen"
+      args="1.0 1.0 0.6 0.0 0.0 0.0 human_footprint cf/base_link 20"/>
+ -->
   </group>
 </launch>
