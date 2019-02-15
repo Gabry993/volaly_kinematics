@@ -29,9 +29,6 @@ class PointingNode:
         arm_pointer_topic = rospy.get_param('~arm_pointer_topic', 'arm_pointer')
         self.pub_arm_pointer = rospy.Publisher(arm_pointer_topic, PoseStamped, queue_size = 100)
 
-        # arm_pointer_sphere_topic = rospy.get_param('~arm_pointer_sphere_topic', 'arm_pointer_sphere')
-        # self.pub_arm_pointer_sphere = rospy.Publisher(arm_pointer_sphere_topic, PoseStamped, queue_size = 100)
-
         pointing_ray_topic = rospy.get_param('~pointing_ray_topic', 'pointing_ray')
         self.pub_pointing_ray = rospy.Publisher(pointing_ray_topic, PoseStamped, queue_size = 100)
 
@@ -324,12 +321,13 @@ class PointingNode:
 
                     if ray_origin_kdl_frame and shape_origin_kdl_frame:
                         pointer_pose = self.get_pointer(self.ws_shape, ray_kdl_frame)
-                        m_msg = self.create_rviz_marker(self.ws_shape, self.ws_shape.point - copy.deepcopy(shape_origin_kdl_frame.p))
-
-                        if m_msg:
-                            self.pub_markers.publish(m_msg)
 
                         if pointer_pose:
+                            m_msg = self.create_rviz_marker(self.ws_shape, self.ws_shape.point - copy.deepcopy(shape_origin_kdl_frame.p))
+
+                            if m_msg:
+                                self.pub_markers.publish(m_msg)
+
                             pose_msg = PoseStamped()
                             pose_msg.header = ray_tf.header
                             pose_msg.pose = pointer_pose
@@ -349,5 +347,5 @@ class PointingNode:
 if __name__ == '__main__':
     rospy.init_node('pointing_model', anonymous=False)
 
-    model = PointingNode()
-    model.run()
+    node = PointingNode()
+    node.run()
