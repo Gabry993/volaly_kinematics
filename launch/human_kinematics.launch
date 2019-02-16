@@ -1,6 +1,7 @@
 <launch>
   <arg name="publish_rate" default="50" />
   <arg name="robot_name" default="cf"/>
+  <arg name="robot_frame" default="$(arg robot_name)/base_link"/>
   <arg name="bracelet_name" default="mwear"/>
   <arg name="mwear_address" default="d8:14:50:a0:d4:87"/>
   <arg name="imu_joint_states_topic" default="$(arg bracelet_name)/joint_states"/>
@@ -33,7 +34,7 @@
       <param name="ray_origin_frame" value="eyes"/>
       <param name="ray_pass_frame" value="finger"/>
       <param name="human_frame" value="human_footprint"/>
-      <param name="robot_frame" value="$(arg robot_name)/base_link"/>
+      <param name="robot_frame" value="$(arg robot_frame)"/>
 
       <param name="arm_pointer_topic" value="arm_pointer"/>
       <param name="pointing_ray_topic" value="pointing_ray"/>
