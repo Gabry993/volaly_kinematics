@@ -58,7 +58,7 @@ class HeadFingerModel(PointingModel):
             origin_tf = self._tf_buff.lookup_transform(self._fixed_frame, self._ray_origin_frame, rospy.Time())
             pass_tf = self._tf_buff.lookup_transform(self._fixed_frame, self._ray_pass_frame, rospy.Time())
         except (tf2_ros.LookupException, tf2_ros.ConnectivityException, tf2_ros.ExtrapolationException), e:
-            rospy.logerr_throttle_identical(5.0, e.message)
+            rospy.logerr_throttle(5.0, e.message)
             return None
 
         pos_origin = kdl.Vector(origin_tf.transform.translation.x,

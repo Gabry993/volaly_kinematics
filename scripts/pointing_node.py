@@ -173,7 +173,7 @@ class PointingNode:
                     .format(fixed_frame, target_frame, dt.to_sec()))
                 return None
         except (tf2_ros.LookupException, tf2_ros.ConnectivityException, tf2_ros.ExtrapolationException), e:
-            rospy.logerr_throttle_identical(10.0, e.message)
+            rospy.logerr_throttle(10.0, e.message)
             return None
 
         kdl_frame = transform_to_kdl(tf_frame)
