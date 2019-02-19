@@ -47,7 +47,7 @@
 
     </node>
 
-    <node name="wrist_gest" type="meta_gest.py" pkg="volaly_gestures" required="true" output="screen">
+    <!--node name="wrist_gest" type="meta_gest.py" pkg="volaly_gestures" required="true" output="screen">
         <param name="publish_rate" value="50.0"/>
         <param name="cache_time" value="30.0"/>
         <param name="averaging_time" value="2.5"/>
@@ -61,7 +61,7 @@
 
         <param name="vibration_pattern_topic" value="$(arg bracelet_name)/vibration_pattern"/>
         <param name="vibration_time" value="0.080"/>
-    </node>
+    </node-->
 
 <!--     <node name="static_robot_tf" pkg="tf" type="static_transform_publisher" required="true" output="screen"
       args="1.0 1.0 0.6 0.0 0.0 0.0 human_footprint cf/base_link 20"/>
