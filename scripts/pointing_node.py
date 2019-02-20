@@ -130,24 +130,30 @@ class PointingNode:
                 else:
                     switch_point = copy.deepcopy(robot_kdl_frame.p)
 
+
                 new_pointer_pose = self.get_pointer(req_ws_shape, ray_kdl_frame, switch_point)
 
-                if cur_pointer_pose and new_pointer_pose:
-                    cur_pos = copy.deepcopy(tfc.fromMsg(cur_pointer_pose).p)
-                    new_pos = copy.deepcopy(tfc.fromMsg(new_pointer_pose).p)
-                    dist_vector = (cur_pos - new_pos)
-                    dist = dist_vector.Norm()
-
-                    if dist > self.pointer_switch_margin:
-                        raise rospy.ServiceException('Maximum switch margin ({}m) is exceeded: {:.3f}m'
-                            .format(self.pointer_switch_margin, dist))
-                        # return None
-
-                    # Since all the checks succeeded we can update the pass_point of the shape
+                if req.force:
+                    #### Forced update #######################################
+                    # Ignore the safety checks. Useful for resetting the state
                     new_pointer_pose = self.get_pointer(req_ws_shape, ray_kdl_frame, switch_point, cache=True)
-
                 else:
-                    raise rospy.ServiceException('Pointer does not exist for requested workspace shape')
+                    if cur_pointer_pose and new_pointer_pose:
+                        cur_pos = copy.deepcopy(tfc.fromMsg(cur_pointer_pose).p)
+                        new_pos = copy.deepcopy(tfc.fromMsg(new_pointer_pose).p)
+                        dist_vector = (cur_pos - new_pos)
+                        dist = dist_vector.Norm()
+
+                        if dist > self.pointer_switch_margin:
+                            raise rospy.ServiceException('Maximum switch margin ({}m) is exceeded: {:.3f}m'
+                                .format(self.pointer_switch_margin, dist))
+                            # return None
+
+                        # Since all the checks succeeded we can update the pass_point of the shape
+                        new_pointer_pose = self.get_pointer(req_ws_shape, ray_kdl_frame, switch_point, cache=True)
+
+                    else:
+                        raise rospy.ServiceException('Pointer does not exist for requested workspace shape')
 
             else:
                 raise rospy.ServiceException('Unable to obtain robot\'s frame. Is robot localized?')
