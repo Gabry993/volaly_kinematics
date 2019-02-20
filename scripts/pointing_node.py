@@ -35,6 +35,9 @@ class PointingNode:
         self.pointer_switch_margin = rospy.get_param('~pointer_switch_margin', 0.10) # 10 cm
         self.switch_at_pointer = rospy.get_param('~switch_at_pointer', False)
 
+        min_elev_angle_deg = rospy.get_param('~min_elev_angle_deg', 5.0) # 5 deg
+        self.min_elevation_angle = math.radians(min_elev_angle_deg)
+
         markers_topic = rospy.get_param('~markers_topic', 'markers')
         self.pub_markers = rospy.Publisher(markers_topic, Marker, queue_size = 10)
 
@@ -49,8 +52,8 @@ class PointingNode:
         self.cylinder = Cylinder(self.human_frame, axis=kdl.Vector(0.0, 0.0, 1.0))
         self.sphere = Sphere(self.ray_origin_frame)
 
-        self.ws_shape = self.xy_plane
-        # self.ws_shape = self.cylinder
+        # self.ws_shape = self.xy_plane
+        self.ws_shape = self.cylinder
         # self.ws_shape = self.sphere
 
         self.srv_set_workspace_shape = rospy.Service('set_workspace_shape', SetWorkspaceShape, self.set_workspace_shape)
@@ -133,13 +136,17 @@ class PointingNode:
 
                 new_pointer_pose = self.get_pointer(req_ws_shape, ray_kdl_frame, switch_point)
 
-                eyes_robot_vector = kdl.Vector(robot_kdl_frame.p - ray_origin_frame.p)
+                eyes_robot_vector = kdl.Vector(robot_kdl_frame.p - ray_origin_kdl_frame.p)
 
-                robot_elev_frame = self.pointing_model._frame_from_direction(ray_origin_frame.p, eyes_robot_vector)
+                robot_elev_frame = self.pointing_model._frame_from_direction(ray_origin_kdl_frame.p, eyes_robot_vector)
                 _, pitch, _ = robot_elev_frame.M.GetRPY()
 
-                if math.fabs(math.degrees(pitch)) < 5.0:
-                    raise rospy.ServiceException('Drone elevation angle is less than {} deg: {}. Ignoring'.format(math.degrees(pitch)))
+                if math.fabs(pitch) < self.min_elevation_angle:
+                    raise rospy.ServiceException('Drone elevation angle is less than {} deg: {}. Ignoring'
+                        .format(math.degrees(self.min_elevation_angle), math.degrees(pitch)))
+                else:
+                    # Since the safety check succeeded we can update the pass_point of the shape
+                    new_pointer_pose = self.get_pointer(req_ws_shape, ray_kdl_frame, switch_point, cache = True)
 
             else:
                 raise rospy.ServiceException('Unable to obtain robot\'s frame. Is robot localized?')

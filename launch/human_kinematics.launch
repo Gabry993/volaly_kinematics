@@ -41,6 +41,7 @@
 
       <param name="switch_at_pointer" value="false"/>
       <param name="pointer_switch_margin" value="0.30"/>
+      <param name="min_elev_angle_deg" value="5.0"/>
 
       <!-- Visualization -->
       <param name="markers_topic" value="markers"/>
