@@ -14,7 +14,7 @@
       <rosparam param="led_color"><!-- cyan -->
           {r: 0.0, g: 1.0, b: 1.0, a: 1.0}
       </rosparam>
-      <rosparam command="load" file="$(find metawear_ros)/config/mwear.yaml"/>
+      <!-- <rosparam command="load" file="$(find metawear_ros)/config/mwear.yaml"/> -->
     </node>
 
     <!-- Clean previously loaded model -->
