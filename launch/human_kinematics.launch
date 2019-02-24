@@ -8,7 +8,7 @@
 
   <group ns="human">
     <!-- Sensor (MetaWear) -->
-    <node name="mwear" type="metawear_node.py" pkg="metawear_ros" required="true" output="screen">
+    <node name="mwear" type="metawear_node.py" pkg="metawear_ros" respawn="true" output="screen">
       <param name="address" type="string" value="$(arg mwear_address)"/>
       <param name="mimic_myo_frame" value="false"/>
       <rosparam param="led_color"><!-- cyan -->
