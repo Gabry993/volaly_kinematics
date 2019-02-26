@@ -8,6 +8,7 @@ import tf2_ros
 import tf_conversions as tfc
 import PyKDL as kdl
 
+from std_msgs.msg import String
 from geometry_msgs.msg import Pose, PoseStamped
 from tf2_geometry_msgs import transform_to_kdl
 from visualization_msgs.msg import Marker
@@ -55,8 +56,11 @@ class PointingNode:
         # self.ws_shape = self.xy_plane
         self.ws_shape = self.cylinder
         # self.ws_shape = self.sphere
+        self.last_ws_shape = None
 
         self.srv_set_workspace_shape = rospy.Service('set_workspace_shape', SetWorkspaceShape, self.set_workspace_shape)
+
+        self.pub_workspace_shape = rospy.Publisher('workspace_shape', String, queue_size = 10, latch = True)
 
     def get_pointer(self, ws_shape, ray_kdl_frame, pass_point=None, cache=False):
         robot_kdl_frame = self.frame_from_tf(self.human_frame, self.robot_frame)
@@ -297,12 +301,27 @@ class PointingNode:
 
         return m
 
+    def get_shape_name(self, ws_shape):
+        if ws_shape is self.xy_plane:
+            return 'WORKSPACE_XY_PLANE'
+        elif ws_shape is self.vis_plane:
+            return 'WORKSPACE_VISUAL_PLANE'
+        elif ws_shape is self.cylinder:
+            return 'WORKSPACE_CYLINDER'
+        elif ws_shape is self.sphere:
+            return 'WORKSPACE_SPHERE'
+
     def run(self):
         loop_rate = rospy.Rate(self.publish_rate)
 
         while not rospy.is_shutdown():
             try:
                 loop_rate.sleep()
+
+                if self.ws_shape:
+                    if self.ws_shape != self.last_ws_shape:
+                        self.pub_workspace_shape.publish(self.get_shape_name(self.ws_shape))
+                        self.last_ws_shape = self.ws_shape
 
                 ray_tf = self.pointing_model.pointing_ray()
 
