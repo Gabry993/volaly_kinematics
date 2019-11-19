@@ -5,10 +5,11 @@
   <arg name="bracelet_name" default="mwear"/>
   <arg name="mwear_address" default="d8:14:50:a0:d4:87"/>
   <arg name="imu_joint_states_topic" default="$(arg bracelet_name)/joint_states"/>
+  <arg name="use_gui" default="false"/>
 
   <group ns="human">
     <!-- Sensor (MetaWear) -->
-    <node name="mwear" type="metawear_node.py" pkg="metawear_ros" required="true" output="screen">
+    <node unless="$(arg use_gui)" name="mwear" type="metawear_node.py" pkg="metawear_ros" required="true" output="screen">
       <param name="address" type="string" value="$(arg mwear_address)"/>
       <param name="mimic_myo_frame" value="false"/>
       <param name="give_button_feedback" value="true"/>
@@ -23,7 +24,7 @@
     <param name="robot_description" textfile="$(find volaly_kinematics)/urdf/human_kinematics.urdf" />
 
     <node name="joint_state_publisher" pkg="joint_state_publisher" type="joint_state_publisher" required="true" output="screen">
-      <param name="use_gui" value="false"/>
+      <param name="use_gui" value="$(arg use_gui)"/>
       <param name="rate" value="50"/>
       <rosparam param="source_list" subst_value="true">[$(arg imu_joint_states_topic)]</rosparam>
       <rosparam command="load" file="$(find volaly_kinematics)/config/human_kinematics.yaml"/>
