@@ -1,0 +1,42 @@
+<launch>
+  <arg name="publish_rate" default="50" />
+  <arg name="robot_name" default="cf"/>
+  <arg name="robot_frame" default="$(arg robot_name)/base_link"/>
+
+  <arg name="imu_joint_states_topic" default="$(arg bracelet_name)/joint_states"/>
+  <arg name="use_gui" default="false"/>
+  <group>
+    <push-ros-namespace namespace="human"/>
+      <!-- Clean previously loaded model -->
+      <rosparam command="delete" param="robot_description"/>
+      <param name="robot_description" textfile="$(find-pkg-share volaly_kinematics)/urdf/human_kinematics.urdf" />
+
+      <node name="joint_state_publisher" pkg="joint_state_publisher" exec="joint_state_publisher" required="true" output="screen">
+        <param name="use_gui" value="$(arg use_gui)"/>
+        <param name="rate" value="50"/>
+        <rosparam param="source_list" subst_value="true">[$(arg imu_joint_states_topic)]</rosparam>
+        <rosparam command="load" file="$(find-pkg-share volaly_kinematics)/config/human_kinematics.yaml"/>
+      </node>
+
+      <node name="robot_state_publisher" pkg="robot_state_publisher" exec="robot_state_publisher" required="true" output="screen"/>
+
+      <node name="pointing_model" pkg="volaly_kinematics" exec="pointing_node.py" required="true" output="screen">
+        <param name="publish_rate" value="$(arg publish_rate)" />
+        <param name="ray_origin_frame" value="eyes"/>
+        <param name="ray_pass_frame" value="finger"/>
+        <param name="human_frame" value="human_footprint"/>
+        <param name="robot_frame" value="$(arg robot_frame)"/>
+
+        <param name="arm_pointer_topic" value="arm_pointer"/>
+        <param name="pointing_ray_topic" value="pointing_ray"/>
+
+        <param name="switch_at_pointer" value="false"/>
+        <param name="pointer_switch_margin" value="0.30"/>
+        <param name="min_elev_angle_deg" value="5.0"/>
+
+        <!-- Visualization -->
+        <param name="markers_topic" value="markers"/>
+
+      </node>
+  </group>
+</launch>

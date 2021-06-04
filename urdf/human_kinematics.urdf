@@ -1,0 +1,137 @@
+<?xml version="1.0"?>
+<robot name="human">
+  <material name="green">
+    <color rgba="0 1 0 0.7" />
+  </material>
+  <material name="grey">
+    <color rgba="0.3 0.3 0.3 0.7" />
+  </material>
+  <material name="light_grey">
+    <color rgba="0.6 0.6 0.6 0.7" />
+  </material>
+  <material name="white">
+    <color rgba="1.0 1.0 1.0 0.9" />
+  </material>
+
+  <link name="human_footprint">
+    <visual>
+      <origin xyz="0.0 0.0 0.005"/>
+      <geometry>
+        <box size="0.3 0.3 0.01"/>
+      </geometry>
+      <material name="grey"/>
+    </visual>
+  </link>
+
+  <joint name="footprint_to_neck" type="prismatic">
+    <parent link="human_footprint"/>
+    <child link="neck"/>
+    <axis xyz="0 0 1"/>
+    <limit lower="0.0" upper="2.0" effort="0.0" velocity="0.0"/>
+  </joint>
+
+  <link name="neck">
+    <visual>
+      <origin xyz="0.0 0.0 -0.735"/>
+      <geometry>
+        <cylinder radius="0.04" length="1.47"/>
+      </geometry>
+      <material name="grey"/>
+    </visual>
+  </link>
+
+  <joint name="neck_to_eyes" type="prismatic">
+    <parent link="neck"/>
+    <child link="eyes"/>
+    <axis xyz="0 0 1"/>
+    <limit lower="0.0" upper="2.0" effort="0.0" velocity="0.0"/>
+  </joint>
+
+  <link name="eyes">
+    <visual>
+      <geometry>
+        <sphere radius="0.12"/>
+      </geometry>
+      <material name="green"/>
+    </visual>
+  </link>
+
+  <joint name="neck_to_shoulder" type="prismatic">
+    <parent link="neck"/>
+    <child link="shoulder"/>
+    <axis xyz="0 -1 0"/>
+    <limit lower="0.0" upper="2.0" effort="0.0" velocity="0.0"/>
+  </joint>
+
+  <link name="shoulder">
+  </link>
+
+  <joint name="shoulder_to_wrist_yaw" type="continuous">
+    <parent link="shoulder"/>
+    <child link="shoulder_yaw"/>
+    <axis xyz="0 0 1"/>
+  </joint>
+
+  <link name="shoulder_yaw">
+  </link>
+
+  <joint name="shoulder_to_wrist_pitch" type="continuous">
+    <parent link="shoulder_yaw"/>
+    <child link="shoulder_pitch"/>
+    <axis xyz="0 1 0"/>
+  </joint>
+
+  <link name="shoulder_pitch">
+  </link>
+
+  <joint name="shoulder_to_wrist_roll" type="continuous">
+    <parent link="shoulder_pitch"/>
+    <child link="shoulder_roll"/>
+    <axis xyz="1 0 0"/>
+  </joint>
+
+  <link name="shoulder_roll">
+  </link>
+
+  <joint name="shoulder_to_wrist" type="prismatic">
+    <parent link="shoulder_roll"/>
+    <child link="wrist"/>
+    <limit lower="0.0" upper="2.0" effort="0.0" velocity="0.0"/>
+    <axis xyz="1 0 0"/>
+  </joint>
+
+  <link name="wrist">
+    <visual>
+      <origin xyz="0.05 -0.0275 0.0"/>
+      <geometry>
+        <box size="0.1 0.07 0.017"/>
+      </geometry>
+      <material name="white"/>
+    </visual>
+    <visual>
+      <origin xyz="-0.255 0.0 0.0" rpy="0 1.57057 0"/>
+      <geometry>
+        <cylinder radius="0.02" length="0.51"/>
+      </geometry>
+      <material name="white"/>
+    </visual>
+  </link>
+
+  <joint name="wrist_to_finger" type="prismatic">
+    <parent link="wrist"/>
+    <child link="finger"/>
+    <limit lower="0.0" upper="2.0" effort="0.0" velocity="0.0"/>
+    <axis xyz="1 0 0"/>
+  </joint>
+
+  <link name="finger">
+    <visual>
+      <origin xyz="-0.035 0.0 0.0" rpy="0 1.57075 0"/>
+      <geometry>
+        <cylinder radius="0.0075" length="0.10"/>
+      </geometry>
+      <material name="white"/>
+    </visual>
+  </link>
+
+</robot>
