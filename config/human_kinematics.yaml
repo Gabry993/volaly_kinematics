@@ -1,7 +1,0 @@
-zeros:
-  footprint_to_neck: 1.47
-  neck_to_eyes: 0.22
-  #neck_to_shoulder: 0.18
-  neck_to_shoulder: 0.0
-  shoulder_to_wrist: 0.51
-  wrist_to_finger: 0.18
