@@ -404,7 +404,7 @@ class PointingNode(rclpy.node.Node):
             if dt > rclpy.duration.Duration(seconds=5.0):
                 self.get_logger().warn(
                     "Transformation [{}] -> [{}] is too old. Last seen {:.3f}s ago. Ignoring".format(
-                        fixed_frame, target_frame, dt.nanoseconds() / 1e-9
+                        fixed_frame, target_frame, dt.nanoseconds / 1e-9
                     )
                 )
                 return None
