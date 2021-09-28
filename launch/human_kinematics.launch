@@ -4,43 +4,34 @@
   <arg name="robot_frame" default="$(var robot_name)/base_link"/>
   <arg name="imu_name" default="imu"/>
   <arg name="rotation_topic" default="$(var imu_name)"/>
-  <arg name="imu_joint_states_topic" default="$(var imu_name)/joint_states"/>
+  <let name="imu_joint_states_topic" value="$(var imu_name)/joint_states"/>
   <arg name="use_gui" default="false"/>
   <arg name="user_kinematics" default="human"/>
-  <arg name="user_prefix" default="user1"/>
+  <arg name="user_name" default=""/>
+  <let name="user_tf_prefix" value="$(eval '\'$(var user_name)/\' if \'$(var user_name)\' else \'\'')"/>
 
   <group>
-      <!-- <push-ros-namespace namespace="human"/>-->
-      <!-- Clean previously loaded model -->
-      <!-- <rosparam command="delete" param="robot_description"/> -->
-      <!-- <param name="robot_description" value="$(command 'cat $(find-pkg-share volaly_kinematics)/urdf/human_kinematics.urdf')"/> -->
-      <node name="joint_state_publisher" pkg="joint_state_publisher" exec="joint_state_publisher" output="screen">
-      <!-- <node name="joint_state_publisher" pkg="joint_state_publisher" exec="joint_state_publisher" required="true" output="screen" args="$(find-pkg-share volaly_kinematics)/urdf/human_kinematics.urdf"> -->
-        <param name="use_gui" value="$(var use_gui)"/>
-        <param name="rate" value="50"/>
-        <param name="source_list" value="$(var imu_joint_states_topic)" value-sep=","/>
-        <param from="$(find-pkg-share volaly_kinematics)/config/$(var user_kinematics)_kinematics.yaml"/>
-      </node>
+      <push-ros-namespace namespace="$(var user_name)"/>
 
-      <node pkg="robot_state_publisher" exec="robot_state_publisher" output="screen">
-          <param name='robot_description' value="$(command 'cat $(find-pkg-share volaly_kinematics)/urdf/human_kinematics.urdf')"/>
-      </node>
-
-
-      <!-- <node name="robot_state_publisher" pkg="robot_state_publisher" exec="robot_state_publisher" required="true" output="screen"/> -->
+      <include file="$(find-pkg-share volaly_kinematics)/launch/human_model.launch.py">
+        <arg name="tf_prefix" value="$(var user_tf_prefix)"/>
+        <arg name="namespace" value=""/>
+        <arg name="biometrics" value="$(find-pkg-share volaly_kinematics)/config/$(var user_kinematics)_kinematics.yaml"/>
+        <arg name="rate" value="$(var publish_rate)"/>
+        <arg name="use_gui" value="$(var use_gui)"/>
+        <arg name="imu_joint_states_topic" value="$(var imu_joint_states_topic)"/>
+      </include>
 
       <node name="pointing_node" pkg="volaly_kinematics" exec="pointing_node.py" output="screen">
         <param name="publish_rate" value="$(var publish_rate)" />
-        <param name="ray_origin_frame" value="eyes"/>
-        <param name="ray_pass_frame" value="finger"/>
-        <param name="human_frame" value="human_footprint"/>
+        <param name="ray_origin_frame" value="$(var user_tf_prefix)eyes"/>
+        <param name="ray_pass_frame" value="$(var user_tf_prefix)finger"/>
+        <param name="human_frame" value="$(var user_tf_prefix)human_footprint"/>
+        <param name="joint_prefix" value="$(var user_tf_prefix)shoulder_to_wrist"/>
         <param name="robot_frame" value="$(var robot_frame)"/>
         <param name="rotation_topic" value="$(var rotation_topic)"/>
-
         <param name="arm_pointer_topic" value="arm_pointer"/>
         <param name="pointing_ray_topic" value="pointing_ray"/>
-        <param name="user_prefix" value="user_prefix"/>
-
         <param name="switch_at_pointer" value="false"/>
         <param name="pointer_switch_margin" value="0.30"/>
         <param name="min_elev_angle_deg" value="5.0"/>
