@@ -41,6 +41,13 @@ class PointingNode(rclpy.node.Node):
         self.human_frame = self.declare_parameter(
             "human_frame", "human_footprint"
         ).value
+
+        self.user_prefix = self.declare_parameter(
+            "user_prefix", ""
+        ).value
+        self.user_prefix += "/" if self.user_prefix != "" else ""
+        self.human_frame = self.user_prefix + self.human_frame
+
         self.robot_frame = self.declare_parameter(
             "robot_frame", "robot_base_link"
         ).value
@@ -133,7 +140,7 @@ class PointingNode(rclpy.node.Node):
 
         #### Experimental ####
         joint_states_topic = self.declare_parameter(
-            "joint_states_topic", "/imu/joint_states"
+            "joint_states_topic", "imu/joint_states"
         ).value
         self.joint_prefix = self.declare_parameter(
             "joint_prefix", "shoulder_to_wrist"

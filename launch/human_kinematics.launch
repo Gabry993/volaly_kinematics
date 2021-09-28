@@ -1,5 +1,5 @@
 <launch>
-  <arg name="publish_rate" default="50" />
+  <arg name="publish_rate" default="50." />
   <arg name="robot_name" default="cf"/>
   <arg name="robot_frame" default="$(var robot_name)/base_link"/>
   <arg name="imu_name" default="imu"/>
@@ -7,13 +7,14 @@
   <arg name="imu_joint_states_topic" default="$(var imu_name)/joint_states"/>
   <arg name="use_gui" default="false"/>
   <arg name="user_kinematics" default="human"/>
+  <arg name="user_prefix" default="user1"/>
 
   <group>
-    <!-- <push-ros-namespace namespace="human"/> -->
+      <!-- <push-ros-namespace namespace="human"/>-->
       <!-- Clean previously loaded model -->
       <!-- <rosparam command="delete" param="robot_description"/> -->
       <!-- <param name="robot_description" value="$(command 'cat $(find-pkg-share volaly_kinematics)/urdf/human_kinematics.urdf')"/> -->
-      <node name="joint_state_publisher" pkg="joint_state_publisher" exec="joint_state_publisher" required="true" output="screen">
+      <node name="joint_state_publisher" pkg="joint_state_publisher" exec="joint_state_publisher" output="screen">
       <!-- <node name="joint_state_publisher" pkg="joint_state_publisher" exec="joint_state_publisher" required="true" output="screen" args="$(find-pkg-share volaly_kinematics)/urdf/human_kinematics.urdf"> -->
         <param name="use_gui" value="$(var use_gui)"/>
         <param name="rate" value="50"/>
@@ -21,14 +22,14 @@
         <param from="$(find-pkg-share volaly_kinematics)/config/$(var user_kinematics)_kinematics.yaml"/>
       </node>
 
-      <node pkg="robot_state_publisher" exec="robot_state_publisher" required="true" output="screen">
+      <node pkg="robot_state_publisher" exec="robot_state_publisher" output="screen">
           <param name='robot_description' value="$(command 'cat $(find-pkg-share volaly_kinematics)/urdf/human_kinematics.urdf')"/>
       </node>
 
 
       <!-- <node name="robot_state_publisher" pkg="robot_state_publisher" exec="robot_state_publisher" required="true" output="screen"/> -->
 
-      <node name="pointing_node" pkg="volaly_kinematics" exec="pointing_node.py" required="true" output="screen">
+      <node name="pointing_node" pkg="volaly_kinematics" exec="pointing_node.py" output="screen">
         <param name="publish_rate" value="$(var publish_rate)" />
         <param name="ray_origin_frame" value="eyes"/>
         <param name="ray_pass_frame" value="finger"/>
@@ -38,6 +39,7 @@
 
         <param name="arm_pointer_topic" value="arm_pointer"/>
         <param name="pointing_ray_topic" value="pointing_ray"/>
+        <param name="user_prefix" value="user_prefix"/>
 
         <param name="switch_at_pointer" value="false"/>
         <param name="pointer_switch_margin" value="0.30"/>
