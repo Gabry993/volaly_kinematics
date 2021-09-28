@@ -42,11 +42,11 @@ class PointingNode(rclpy.node.Node):
             "human_frame", "human_footprint"
         ).value
 
-        self.user_prefix = self.declare_parameter(
-            "user_prefix", ""
-        ).value
-        self.user_prefix += "/" if self.user_prefix != "" else ""
-        self.human_frame = self.user_prefix + self.human_frame
+        # self.user_prefix = self.declare_parameter(
+        #     "user_prefix", ""
+        # ).value
+        # self.user_prefix += "/" if self.user_prefix != "" else ""
+        # self.human_frame = self.user_prefix + self.human_frame
 
         self.robot_frame = self.declare_parameter(
             "robot_frame", "robot_base_link"
