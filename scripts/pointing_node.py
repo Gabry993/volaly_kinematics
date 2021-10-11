@@ -420,7 +420,7 @@ class PointingNode(rclpy.node.Node):
             tf2_ros.ConnectivityException,
             tf2_ros.ExtrapolationException,
         ) as e:
-            # self.get_logger().error(str(e))
+            self.get_logger().error(str(e), throttle_duration_sec=5)
             return None
 
         kdl_frame = self.transform_to_kdl(tf_frame)

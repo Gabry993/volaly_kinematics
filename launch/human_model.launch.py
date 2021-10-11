@@ -44,10 +44,10 @@ def joint_state_publisher(context: LaunchContext,
                           ) -> List[Node]:
     kwargs = {k: perform_substitutions(context, [v]) for k, v in substitutions.items()}
     params = {
-        'use_gui': kwargs['use_gui'] in ('true', 'True'),
         'rate': float(kwargs['rate']),
         'source_list': [kwargs['imu_joint_states_topic']]
     }
+    use_gui = kwargs['use_gui'] in ('true', 'True')
     tf_prefix = kwargs['tf_prefix']
     try:
         with open(kwargs['biometrics'], 'r') as f:
@@ -56,9 +56,10 @@ def joint_state_publisher(context: LaunchContext,
     except FileNotFoundError:
         pass
     name = 'joint_state_publisher'
-    if kwargs['use_gui']:
+    if use_gui:
         name += "_gui"
     print(params)
+    print(use_gui)
     print('tf_prefix', tf_prefix)
     node = Node(
         package=name,
