@@ -4,6 +4,7 @@ import math
 import copy
 import sys
 
+import numpy as np
 import tf2_ros
 
 # import tf_conversions as tfc

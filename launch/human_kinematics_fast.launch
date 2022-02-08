@@ -1,0 +1,20 @@
+<launch>
+  <arg name="publish_rate" default="50." />
+  <arg name="imu_name" default="imu"/>
+  <let name="rotation_topic" value="$(var imu_name)"/>
+  <arg name="user_kinematics" default="human"/>
+  <arg name="user_name" default=""/>
+  <arg name="pointing_ray_topic" default="pointing_ray"/>
+  <let name="user_tf_prefix" value="$(eval '\'$(var user_name)/\' if \'$(var user_name)\' else \'\'')"/>
+
+  <group>
+      <push-ros-namespace namespace="$(var user_name)"/>
+      <node name="pointing_node" pkg="volaly_kinematics" exec="pointing_node_fast.py" output="screen">
+        <param name="publish_rate" value="$(var publish_rate)" />
+        <param name="human_frame" value="$(var user_tf_prefix)human_footprint"/>
+        <param name="rotation_topic" value="$(var rotation_topic)"/>
+        <param name="pointing_ray_topic" value="$(var pointing_ray_topic)"/>
+        <param name="biometrics" value="$(find-pkg-share volaly_kinematics)/config/$(var user_kinematics)_kinematics.yaml"/>
+      </node>
+  </group>
+</launch>

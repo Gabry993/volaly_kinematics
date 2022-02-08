@@ -27,5 +27,6 @@ setup(
     entry_points={
         "console_scripts": [],
     },
-    scripts=["scripts/pointing_node.py"],
+    scripts=["scripts/pointing_node.py",
+             "scripts/pointing_node_fast.py"],
 )
