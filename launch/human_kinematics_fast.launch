@@ -10,7 +10,7 @@
   <group>
       <push-ros-namespace namespace="$(var user_name)"/>
       <node name="pointing_node" pkg="volaly_kinematics" exec="pointing_node_fast.py" output="screen">
-        <param name="max_publish_rate" value="$(var publish_rate)" />
+        <param name="max_publish_rate" value="$(var max_publish_rate)" />
         <param name="human_frame" value="$(var user_tf_prefix)human_footprint"/>
         <param name="rotation_topic" value="$(var rotation_topic)"/>
         <param name="pointing_ray_topic" value="$(var pointing_ray_topic)"/>
