@@ -154,18 +154,19 @@ class PointingNode(rclpy.node.Node):
         rotation_topic = self.declare_parameter(
             "rotation_topic", "/metawear_ros/rotation"
         ).value
+
         qos = rclpy.qos.QoSProfile(
             depth=10,
             durability=rclpy.qos.QoSDurabilityPolicy.VOLATILE,
-            reliability=rclpy.qos.QoSReliabilityPolicy.RELIABLE,
+            reliability=rclpy.qos.QoSReliabilityPolicy.BEST_EFFORT,
         )
-
         self.sub_rotation = self.create_subscription(
             QuaternionStamped,
             rotation_topic,
             self.rotation_to_ray_cb,
             qos,
         )
+
         self.create_subscription(
             PoseStamped,
             "/optitrack/hand",
@@ -173,6 +174,11 @@ class PointingNode(rclpy.node.Node):
             100,
         )
 
+        qos = rclpy.qos.QoSProfile(
+            depth=10,
+            durability=rclpy.qos.QoSDurabilityPolicy.VOLATILE,
+            reliability=rclpy.qos.QoSReliabilityPolicy.RELIABLE,
+        )
         self.optitrack_imu_pub = self.create_publisher(
             QuaternionStamped, "/optitrack/imu", qos
         )

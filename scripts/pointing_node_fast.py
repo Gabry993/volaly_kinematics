@@ -64,7 +64,7 @@ class PointingNode(rclpy.node.Node):  # type: ignore
             biometrics = yaml.safe_load(f)
 
         self.pointing_model = PointingModel(**biometrics)
-        maximal_publish_rate = self.declare_parameter("publish_rate", 50.0).value
+        maximal_publish_rate = self.declare_parameter("max_publish_rate", 50.0).value
         self.human_frame = self.declare_parameter(
             "human_frame", "human_footprint"
         ).value
@@ -85,7 +85,7 @@ class PointingNode(rclpy.node.Node):  # type: ignore
         qos = rclpy.qos.QoSProfile(
             depth=10,
             durability=rclpy.qos.QoSDurabilityPolicy.VOLATILE,
-            reliability=rclpy.qos.QoSReliabilityPolicy.RELIABLE,
+            reliability=rclpy.qos.QoSReliabilityPolicy.BEST_EFFORT,
         )
 
         self.sub_rotation = self.create_subscription(
