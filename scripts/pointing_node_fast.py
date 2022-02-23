@@ -65,6 +65,7 @@ class PointingNode(rclpy.node.Node):  # type: ignore
 
         self.pointing_model = PointingModel(**biometrics)
         maximal_publish_rate = self.declare_parameter("max_publish_rate", 50.0).value
+
         self.human_frame = self.declare_parameter(
             "human_frame", "human_footprint"
         ).value
@@ -96,33 +97,35 @@ class PointingNode(rclpy.node.Node):  # type: ignore
         )
 
         self.min_interval = rclpy.duration.Duration(nanoseconds=int(1e9 / maximal_publish_rate))
+        self.deadline = self.get_clock().now()
 
     def rotation_to_ray_cb(self, data: QuaternionStamped) -> None:
-        stamp = rclpy.time.Time.from_msg(data.header.stamp)
-        if self.last_timestamp and (stamp - self.last_timestamp) < self.min_interval:
-            self.last_timestamp = stamp
-            return
-        self.last_timestamp = stamp
+        # stamp = rclpy.time.Time.from_msg(data.header.stamp)
+        # if self.last_timestamp and (stamp - self.last_timestamp) < self.min_interval:
+        #     self.last_timestamp = stamp
+        #     return
+        # self.last_timestamp = stamp
+        if self.get_clock().now() > self.deadline:
+            rot = PyKDL.Rotation.Quaternion(
+                data.quaternion.x,
+                data.quaternion.y,
+                data.quaternion.z,
+                data.quaternion.w,
+            )
+            ray_frame = self.pointing_model.ray(rot)
+            # TODO(Jerome): do we need the transform?
+            # transform_msg = TransformStamped()
+            # transform_msg.child_frame_id = "pointer"
+            # transform_msg.header = data.header
+            # transform_msg.transform = transform_from_frame(ray_frame)
+            # self.tf_br.sendTransform(transform_msg)
 
-        rot = PyKDL.Rotation.Quaternion(
-            data.quaternion.x,
-            data.quaternion.y,
-            data.quaternion.z,
-            data.quaternion.w,
-        )
-        ray_frame = self.pointing_model.ray(rot)
-        # TODO(Jerome): do we need the transform?
-        # transform_msg = TransformStamped()
-        # transform_msg.child_frame_id = "pointer"
-        # transform_msg.header = data.header
-        # transform_msg.transform = transform_from_frame(ray_frame)
-        # self.tf_br.sendTransform(transform_msg)
-
-        ray_pose = PoseStamped()
-        ray_pose.header.stamp = data.header.stamp
-        ray_pose.header.frame_id = self.human_frame
-        ray_pose.pose = pose_from_frame(ray_frame)
-        self.pub_pointing_ray.publish(ray_pose)
+            ray_pose = PoseStamped()
+            ray_pose.header.stamp = self.get_clock().now().to_msg() #data.header.stamp
+            ray_pose.header.frame_id = self.human_frame
+            ray_pose.pose = pose_from_frame(ray_frame)
+            self.pub_pointing_ray.publish(ray_pose)
+            self.deadline += self.min_interval
 
 
 if __name__ == "__main__":
