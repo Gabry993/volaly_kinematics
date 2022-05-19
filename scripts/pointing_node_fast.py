@@ -74,8 +74,13 @@ class PointingNode(rclpy.node.Node):  # type: ignore
         pointing_ray_topic = self.declare_parameter(
             "pointing_ray_topic", "pointing_ray"
         ).value
+        qos = rclpy.qos.QoSProfile(
+            depth=100,
+            durability=rclpy.qos.QoSDurabilityPolicy.VOLATILE,
+            reliability=rclpy.qos.QoSReliabilityPolicy.BEST_EFFORT,
+        )
         self.pub_pointing_ray = self.create_publisher(
-            PoseStamped, pointing_ray_topic, 100
+            PoseStamped, pointing_ray_topic, qos
         )
 
         # self.tf_buff = tf2_ros.Buffer()
