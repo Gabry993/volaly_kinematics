@@ -101,8 +101,18 @@ class PointingNode(rclpy.node.Node):  # type: ignore
             qos,
         )
 
+        qos = rclpy.qos.QoSProfile(
+            depth=10,
+            durability=rclpy.qos.QoSDurabilityPolicy.TRANSIENT_LOCAL,
+            reliability=rclpy.qos.QoSReliabilityPolicy.RELIABLE,
+        )
+        self.create_subscription(Biometrics, 'biometrics', self.has_received_biometrics, qos)
+
         self.min_interval = rclpy.duration.Duration(nanoseconds=int(1e9 / maximal_publish_rate))
         self.deadline = self.get_clock().now()
+
+    def has_received_biometrics(self, msg: Biometrics) -> None:
+        self.pointing_model = PointingModel(**{name: getattr(msg, name) for name in msg.get_fields_and_field_types().keys()})
 
     def rotation_to_ray_cb(self, data: QuaternionStamped) -> None:
         # stamp = rclpy.time.Time.from_msg(data.header.stamp)
